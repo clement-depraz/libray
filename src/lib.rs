@@ -1,6 +1,6 @@
 extern crate image;
 
-mod ray_tracing;
+pub mod ray_tracing;
 
 use ray_tracing::scene::Scene;
 use ray_tracing::color::Color;
@@ -24,5 +24,9 @@ pub fn render(scene: &Scene) -> DynamicImage {
 }
 
 fn to_rgba(color: &Color) -> Rgba<u8> {
-    Rgba::from_channels((color.red / 255.0) as u8, (color.green / 255.0) as u8, (color.blue / 255.0) as u8, 0)
+    Rgba::from_channels(
+        (color.red * 255.0) as u8,
+        (color.green * 255.0) as u8,
+        (color.blue * 255.0) as u8,
+        0)
 }

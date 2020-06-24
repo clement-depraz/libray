@@ -1,6 +1,9 @@
+use serde::{Deserialize};
+
 use super::vector::{Point, Vector};
 use super::color::Color;
 
+#[derive(Deserialize, Debug, Copy, Clone)]
 pub struct Sphere {
     pub center: Point,
     pub radius: f32,
@@ -8,13 +11,16 @@ pub struct Sphere {
     pub refl_pow: f32,
 }
 
+#[derive(Deserialize, Debug, Copy, Clone)]
 pub struct Plane {
     pub origin: Point,
+    #[serde(deserialize_with = "Vector::deserialize_as_norm")]
     pub normal: Vector,
     pub color: Color,
     pub refl_pow: f32,
 }
 
+#[derive(Deserialize, Debug, Copy, Clone)]
 pub enum Element {
     Sphere(Sphere),
     Plane(Plane),

@@ -16,9 +16,12 @@ pub struct Ray {
 
 impl Ray {
     pub fn init_ray(x: u32, y: u32, scene: &Scene) -> Ray {
+        assert!(scene.width > scene.height);
+        let fov_adjustment = (scene.fov.to_radians() / 2.0).tan();
+
         let aspect_ratio = (scene.width as f32) / (scene.height as f32);
-        let sensor_x = (((x as f32 + 0.5) / scene.width as f32) * 2.0 - 1.0) * aspect_ratio;
-        let sensor_y = 1.0 - ((y as f32 + 0.5) / scene.height as f32) * 2.0;
+        let sensor_x = (((x as f32 + 0.5) / scene.width as f32) * 2.0 - 1.0) * aspect_ratio * fov_adjustment;
+        let sensor_y = 1.0 - ((y as f32 + 0.5) / scene.height as f32) * 2.0 * fov_adjustment;
 
         Ray {
             origin: Point::zero(),
@@ -83,7 +86,8 @@ impl Intersectable for Sphere {
 
 impl Intersectable for Plane {
     fn intersect(&self, ray: &Ray) -> Option<f32> {
-        let normal = self.normal.unit_vector();
+        // let normal = self.normal.unit_vector();
+        let normal = &self.normal;
         let denom = normal.dot(&ray.direction);
         if denom > 1e-6 {
             let v = self.origin - ray.origin;
@@ -96,7 +100,7 @@ impl Intersectable for Plane {
     }
 
     fn surface_normal(&self, _: &Point) -> Vector {
-        self.normal.unit_vector() * -1.0
+        self.normal * -1.0
     }
 }
 
@@ -118,16 +122,14 @@ pub fn get_color(scene: &Scene, ray: &Ray, intersection: &Intersection) -> Color
             direction: direction_to_light,
         };
         let shadow_intersection = scene.trace(&shadow_ray);
-        let in_light = shadow_intersection.is_none() ||
-                       shadow_intersection.unwrap().distance > light.distance(&hit_point);
+        let in_light = shadow_intersection.is_none() || shadow_intersection.unwrap().distance > light.distance(&hit_point);
 
         let light_intensity = if in_light {
             light.intensity(&hit_point)
         } else {
             0.0
         };
-        let light_power = (surface_normal.dot(&direction_to_light) as f32).max(0.0) *
-                          light_intensity;
+        let light_power = (surface_normal.dot(&direction_to_light) as f32).max(0.0) * light_intensity;
         let light_reflected = intersection.element.refl_pow() / std::f32::consts::PI;
 
         let light_color = light.color() * light_power * light_reflected;

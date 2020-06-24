@@ -1,6 +1,7 @@
 use std::ops::{Add, Sub, Mul};
+use serde::{Deserialize, Deserializer};
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Deserialize, Copy, Clone, Debug)]
 pub struct Vector {
     pub x: f32,
     pub y: f32,
@@ -63,6 +64,13 @@ impl Vector {
             y: 1.0 / self.y,
             z: 1.0 / self.z
         }
+    }
+
+    pub fn deserialize_as_norm<'de, D>(deserializer: D) -> Result<Vector, D::Error>
+        where D: Deserializer<'de>
+    {
+        let v3 = Vector::deserialize(deserializer)?;
+        Ok(v3.unit_vector())
     }
 }
 

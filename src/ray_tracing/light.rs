@@ -1,18 +1,24 @@
+use serde::{Deserialize};
+
 use super::vector::{Vector, Point};
 use super::color::Color;
 
+#[derive(Deserialize, Debug, Copy, Clone)]
 pub struct PlaneLight {
+    #[serde(deserialize_with = "Vector::deserialize_as_norm")]
     pub direction: Vector,
     pub color: Color,
     pub intensity: f32,
 }
 
+#[derive(Deserialize, Debug, Copy, Clone)]
 pub struct SphericalLight {
     pub position: Point,
     pub color: Color,
     pub intensity: f32,
 }
 
+#[derive(Deserialize, Debug, Copy, Clone)]
 pub enum Light {
     Plane(PlaneLight),
     Spherical(SphericalLight),
