@@ -1,32 +1,34 @@
-extern crate image;
+extern crate ppm;
 
 pub mod ray_tracing;
 
 use ray_tracing::scene::Scene;
-use ray_tracing::color::Color;
 use ray_tracing::{Ray, get_color};
 
-use image::{DynamicImage, GenericImage, Rgba, Pixel};
+use ppm::{Image, PPMType, Pixel};
 
-pub fn render(scene: &Scene) -> DynamicImage {
-    let mut image = DynamicImage::new_rgb8(scene.width, scene.height);
-    let black = Rgba::from_channels(0, 0, 0, 0);
-    for x in 0..scene.width {
-        for y in 0..scene.height {
-            let ray = Ray::init_ray(x, y, scene);
+pub fn render(scene: &Scene) -> Image {
+    let zero_vec = vec![Pixel::new(0, 0, 0); (scene.width * scene.height) as usize];
 
-            let intersection = scene.trace(&ray);
-            let color = intersection.map(|i| to_rgba(&get_color(scene, &ray, &i))).unwrap_or(black);
-            image.put_pixel(x, y, color);
-        }
-    }
-    image
-}
+    let black = Pixel::new(0, 0, 0);
+    let pixel_vec: Vec<Pixel> = zero_vec.iter().enumerate().map(|(index, _)| {
+        let x = index as u32 % scene.width;
+        let y = index as u32 / scene.width;
+        let ray = Ray::init_ray(x, y, scene);
 
-fn to_rgba(color: &Color) -> Rgba<u8> {
-    Rgba::from_channels(
-        (color.red * 255.0) as u8,
-        (color.green * 255.0) as u8,
-        (color.blue * 255.0) as u8,
-        0)
+        let intersection = scene.trace(&ray);
+        intersection.map(|i| {
+            let color = &get_color(scene, &ray, &i);
+            Pixel::new(
+                (color.red * 255.0) as u8,
+                (color.green * 255.0) as u8,
+                (color.blue * 255.0) as u8)
+        }).unwrap_or(black)
+    }).collect();
+
+    Image::new(PPMType::P3,
+        scene.height as usize,
+        scene.width as usize,
+        255,
+        pixel_vec)
 }
