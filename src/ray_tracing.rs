@@ -111,7 +111,7 @@ pub fn get_color(scene: &Scene, ray: &Ray, intersection: &Intersection) -> Color
         let direction_to_light = light.direction * -1.0;
 
         let shadow_ray = Ray {
-            origin: hit_point,
+            origin: hit_point + (direction_to_light * scene.shadow_bias),
             direction: direction_to_light,
         };
         let in_light = scene.trace(&shadow_ray).is_none();

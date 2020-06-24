@@ -48,6 +48,7 @@ pub struct Scene {
     pub height: u32,
     pub elements: Vec<Element>,
     pub lights: Vec<Light>,
+    pub shadow_bias: f32,
 }
 
 pub struct Intersection<'a> {
