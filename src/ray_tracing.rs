@@ -2,7 +2,7 @@ pub mod elements;
 mod vector;
 
 use vector::{Point, Vector};
-use elements::{Scene, Sphere};
+use elements::{Scene, Element, Sphere, Plane};
 
 pub struct Ray {
     pub origin: Point,
@@ -31,6 +31,15 @@ pub trait Intersectable {
     fn intersect(&self, ray: &Ray) -> Option<f32>;
 }
 
+impl Intersectable for Element {
+    fn intersect(&self, ray: &Ray) -> Option<f32> {
+        match *self {
+            Element::Sphere(ref s) => s.intersect(ray),
+            Element::Plane(ref p) => p.intersect(ray),
+        }
+    }
+}
+
 impl Intersectable for Sphere {
     fn intersect(&self, ray: &Ray) -> Option<f32> {
         let l = self.center - ray.origin;
@@ -51,5 +60,20 @@ impl Intersectable for Sphere {
 
         let distance = if t0 < t1 { t0 } else { t1 };
         Some(distance)
+    }
+}
+
+impl Intersectable for Plane {
+    fn intersect(&self, ray: &Ray) -> Option<f32> {
+        let normal = self.normal.unit_vector();
+        let denom = normal.dot(&ray.direction);
+        if denom > 1e-6 {
+            let v = self.origin - ray.origin;
+            let distance = v.dot(&normal) / denom;
+            if distance >= 0.0 {
+                return Some(distance);
+            }
+        }
+        None
     }
 }
