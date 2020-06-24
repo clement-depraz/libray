@@ -101,3 +101,5 @@ impl Mul for Vector {
         }
     }
 }
+
+pub type Point = Vector;
