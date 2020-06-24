@@ -1,17 +1,19 @@
 extern crate ppm;
+extern crate rayon;
 
 pub mod ray_tracing;
 
 use ray_tracing::scene::Scene;
 use ray_tracing::{Ray, get_color};
 
+use rayon::prelude::*;
 use ppm::{Image, PPMType, Pixel};
 
 pub fn render(scene: &Scene) -> Image {
     let zero_vec = vec![Pixel::new(0, 0, 0); (scene.width * scene.height) as usize];
 
     let black = Pixel::new(0, 0, 0);
-    let pixel_vec: Vec<Pixel> = zero_vec.iter().enumerate().map(|(index, _)| {
+    let pixel_vec: Vec<Pixel> = zero_vec.par_iter().enumerate().map(|(index, _)| {
         let x = index as u32 % scene.width;
         let y = index as u32 / scene.width;
         let ray = Ray::init_ray(x, y, scene);

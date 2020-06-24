@@ -66,11 +66,12 @@ impl Vector {
         }
     }
 
+    // https://stackoverflow.com/questions/46753955/how-to-transform-fields-during-deserialization-using-serde
     pub fn deserialize_as_norm<'de, D>(deserializer: D) -> Result<Vector, D::Error>
         where D: Deserializer<'de>
     {
-        let v3 = Vector::deserialize(deserializer)?;
-        Ok(v3.unit_vector())
+        let init_vec = Vector::deserialize(deserializer)?;
+        Ok(init_vec.unit_vector())
     }
 }
 

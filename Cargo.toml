@@ -17,3 +17,4 @@ name = "libray"
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }
 ppm = { git = "https://github.com/Sivarogu/libppm" }
+rayon = "1.3.1"
