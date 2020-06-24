@@ -3,7 +3,7 @@ extern crate image;
 mod ray_tracing;
 
 use ray_tracing::elements::{Scene, Color};
-use ray_tracing::{Ray, Intersectable};
+use ray_tracing::{Ray};
 
 use image::{DynamicImage, GenericImage, Rgba, Pixel};
 
@@ -14,11 +14,9 @@ pub fn render(scene: &Scene) -> DynamicImage {
         for y in 0..scene.height {
             let ray = Ray::init_ray(x, y, scene);
 
-            if scene.sphere.intersect(&ray) {
-                image.put_pixel(x, y, to_rgba(&scene.sphere.color))
-            } else {
-                image.put_pixel(x, y, black);
-            }
+            let intersection = scene.trace(&ray);
+            let color = intersection.map(|i| to_rgba(&i.object.color)).unwrap_or(black);
+            image.put_pixel(x, y, color);
         }
     }
     image
