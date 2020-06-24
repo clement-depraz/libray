@@ -102,4 +102,16 @@ impl Mul for Vector {
     }
 }
 
+impl Mul<f32> for Vector {
+    type Output = Vector;
+
+    fn mul(self, other: f32) -> Vector {
+        Vector {
+            x: self.x * other,
+            y: self.y * other,
+            z: self.z * other,
+        }
+    }
+}
+
 pub type Point = Vector;
