@@ -2,7 +2,7 @@ extern crate image;
 
 mod ray_tracing;
 
-use ray_tracing::elements::{Scene};
+use ray_tracing::scene::Scene;
 use ray_tracing::color::Color;
 use ray_tracing::{Ray, get_color};
 

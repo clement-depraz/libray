@@ -1,5 +1,4 @@
 use super::vector::{Point, Vector};
-use crate::ray_tracing::{Intersectable, Ray};
 use super::color::Color;
 
 pub struct Sphere {
@@ -37,20 +36,6 @@ impl Element {
     }
 }
 
-pub struct Light {
-    pub direction: Vector,
-    pub color: Color,
-    pub intensity: f32,
-}
-
-pub struct Scene {
-    pub width: u32,
-    pub height: u32,
-    pub elements: Vec<Element>,
-    pub lights: Vec<Light>,
-    pub shadow_bias: f32,
-}
-
 pub struct Intersection<'a> {
     pub distance: f32,
     pub element: &'a Element,
@@ -65,14 +50,5 @@ impl<'a> Intersection<'a> {
             distance: distance,
             element: element
         }
-    }
-}
-
-impl Scene {
-    pub fn trace(&self, ray: &Ray) -> Option<Intersection> {
-        self.elements
-            .iter()
-            .filter_map(|s| s.intersect(ray).map(|d| Intersection::new(d, s)))
-            .min_by(|i1, i2| i1.distance.partial_cmp(&i2.distance).unwrap())
     }
 }
